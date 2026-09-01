@@ -1,0 +1,720 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="referrer" content="no-referrer">
+<title>Daily Lab &amp; Handout Worklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Narrow:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#16191c;
+    --paper:#ffffff;
+    --desk:#dfe4e2;
+    --rule:#c6cfcc;
+    --hair:#e3e8e6;
+    --muted:#6d7876;
+    --teal:#0f5c5b;
+    --amber:#a1510e;
+    --amber-tint:#fdf3e6;
+
+    /* visit-type spines — chosen to stay distinct from each other
+       in hue AND in grayscale, so they survive a B&W printer */
+    --cat-36:#0aa19a;      /* bright teal   */
+    --cat-glu:#2743b8;     /* deep blue     */
+    --cat-init:#57891a;    /* green         */
+    --cat-gtt3:#e07000;    /* orange        */
+    --cat-sneak:#b0246f;   /* magenta       */
+    --cat-gen:#7b8288;     /* neutral gray  */
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--desk);
+    color:var(--ink);
+    font-family:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+    font-size:15px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font:inherit;color:inherit}
+  :focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+  /* ---------- screen chrome ---------- */
+  .chrome{max-width:8.5in;margin:0 auto;padding:22px 16px 8px}
+
+  .masthead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+  .wordmark{display:flex;align-items:center;gap:10px}
+  .wordmark .mark{
+    width:26px;height:26px;flex:none;border:2px solid var(--teal);border-radius:3px;
+    display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:700;
+    font-size:13px;color:var(--teal);
+  }
+  .wordmark h1{
+    margin:0;font-family:'Archivo Narrow','Archivo Condensed',sans-serif;
+    font-weight:700;font-size:19px;letter-spacing:.02em;text-transform:uppercase;
+  }
+  .wordmark p{margin:1px 0 0;font-size:12px;color:var(--muted);letter-spacing:.01em}
+
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{
+    border:1px solid var(--rule);background:var(--paper);border-radius:3px;
+    padding:8px 13px;font-size:13px;font-weight:600;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;transition:border-color .12s,background .12s;
+  }
+  .btn:hover{border-color:var(--teal)}
+  .btn[disabled]{opacity:.4;cursor:not-allowed}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+  .btn.primary:hover{background:#0c4a49}
+
+  /* dropzone */
+  .drop{
+    background:var(--paper);border:1px dashed var(--rule);border-radius:4px;
+    padding:26px 20px;text-align:center;cursor:pointer;transition:border-color .12s,background .12s;
+  }
+  .drop:hover,.drop.over{border-color:var(--teal);background:#f6faf9}
+  .drop h2{
+    margin:0 0 4px;font-family:'Archivo Narrow',sans-serif;font-size:16px;
+    text-transform:uppercase;letter-spacing:.06em;
+  }
+  .drop p{margin:0;font-size:13px;color:var(--muted)}
+  .drop .privacy{
+    margin-top:12px;display:inline-block;font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;color:var(--teal);border:1px solid var(--hair);
+    background:#f2f7f6;border-radius:2px;padding:4px 8px;letter-spacing:.02em;
+  }
+
+  .status{margin:12px 0 0;font-size:13px;color:var(--muted);min-height:20px}
+  .status.err{color:var(--amber);font-weight:600}
+
+  /* diagnostics */
+  details.diag{margin:14px 0 0;background:var(--paper);border:1px solid var(--hair);border-radius:4px}
+  details.diag summary{
+    cursor:pointer;padding:9px 13px;font-family:'Archivo Narrow',sans-serif;
+    font-size:13px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;
+  }
+  details.diag .body{padding:0 13px 13px}
+  details.diag pre{
+    margin:0;max-height:260px;overflow:auto;background:#f7f9f8;border:1px solid var(--hair);
+    border-radius:3px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:11px;
+    line-height:1.6;white-space:pre-wrap;color:#3a4441;
+  }
+
+  /* add-row bar */
+  .addbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0;align-items:center}
+  .addbar input,.addbar select{
+    font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--rule);
+    border-radius:3px;background:var(--paper);
+  }
+  .addbar input.time{width:96px;font-family:'JetBrains Mono',monospace}
+  .addbar input.name{flex:1;min-width:150px}
+
+  .sheetwrap{padding:18px 16px 60px;display:flex;justify-content:center}
+
+  /* ---------- the printable sheet ---------- */
+  .sheet{
+    width:8.5in;min-height:11in;background:var(--paper);
+    padding:.5in .5in .45in;box-shadow:0 1px 3px rgba(0,0,0,.14),0 12px 30px rgba(0,0,0,.10);
+  }
+
+  .sheethead{border-bottom:2px solid var(--ink);padding-bottom:9px;margin-bottom:3px}
+  .sheethead .row1{display:flex;align-items:baseline;justify-content:space-between;gap:14px}
+  .sheethead .title{
+    font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:13px;
+    text-transform:uppercase;letter-spacing:.16em;color:var(--teal);
+  }
+  .sheethead .count{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+  .sheethead .date{
+    font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:27px;
+    line-height:1.12;margin:5px 0 0;letter-spacing:-.005em;
+  }
+  .sheethead .span{
+    font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);margin-top:2px;
+  }
+
+  table.grid{width:100%;border-collapse:collapse;table-layout:fixed}
+  table.grid thead th{
+    font-family:'Archivo Narrow',sans-serif;font-size:10.5px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.12em;color:var(--muted);
+    text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule);
+  }
+  col.c1{width:27%} col.c2{width:39%} col.c3{width:34%}
+
+  table.grid tbody tr{border-bottom:1px solid var(--hair);page-break-inside:avoid;break-inside:avoid}
+  table.grid td{padding:9px 9px 10px;vertical-align:top}
+  td.who{border-left:6px solid var(--cat-gen);padding-left:11px;position:relative}
+  tr[data-cat="36wk"]     td.who{border-left-color:var(--cat-36)}
+  tr[data-cat="glucose1"] td.who{border-left-color:var(--cat-glu)}
+  tr[data-cat="initial"]  td.who{border-left-color:var(--cat-init)}
+  tr[data-cat="gtt3"]     td.who{border-left-color:var(--cat-gtt3)}
+  tr[data-cat="sneak"]    td.who{border-left-color:var(--cat-sneak)}
+  tr[data-cat="generic"]  td.who{border-left-color:var(--cat-gen)}
+
+  .pname{font-weight:600;font-size:14.5px;line-height:1.25}
+  .ptime{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500;color:var(--ink)}
+  .pcat{
+    font-family:'Archivo Narrow',sans-serif;font-size:9.5px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.11em;color:var(--muted);margin-top:3px;
+  }
+  [contenteditable]:hover{background:#f2f7f6;border-radius:2px}
+
+  .checks{margin:0;padding:0;list-style:none}
+  .checks.two{column-count:2;column-gap:14px}
+  .check{
+    display:flex;align-items:flex-start;gap:7px;padding:2.5px 0;
+    font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.35;
+    break-inside:avoid;-webkit-column-break-inside:avoid;
+  }
+  .check .box{
+    width:12px;height:12px;flex:none;margin-top:1px;background:#fff;
+    border:1.2px solid var(--ink);border-radius:1px;
+  }
+  .check.flag{color:var(--amber);font-weight:700;letter-spacing:.01em}
+  .check.flag .box{border-color:var(--amber);border-width:1.6px;background:var(--amber-tint)}
+  .check.write{padding:4px 0 3px}
+  .check .note{margin-left:6px;font-weight:700;white-space:normal}
+  .check .wline{
+    flex:1;min-width:52px;align-self:flex-end;height:0;
+    border-bottom:1px solid var(--rule);margin:0 0 3px 5px;
+  }
+  .none{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+
+  .rm{
+    position:absolute;right:-2px;top:6px;border:0;background:none;cursor:pointer;
+    color:var(--muted);font-size:15px;line-height:1;padding:2px 4px;opacity:0;
+  }
+  tr:hover .rm{opacity:1}
+  .rm:hover{color:var(--amber)}
+
+  .sheetfoot{
+    margin-top:14px;padding-top:7px;border-top:1px solid var(--hair);
+    display:flex;justify-content:space-between;gap:12px;
+    font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--muted);
+  }
+
+  .empty{padding:52px 10px;text-align:center;color:var(--muted)}
+  .empty strong{
+    display:block;font-family:'Archivo Narrow',sans-serif;font-size:15px;
+    text-transform:uppercase;letter-spacing:.07em;color:var(--ink);margin-bottom:4px;
+  }
+
+  @media (max-width:900px){
+    .sheet{width:100%;min-height:0;padding:22px 18px}
+    .sheetwrap{padding:14px 10px 48px}
+    col.c1,col.c2,col.c3{width:auto}
+    .sheethead .date{font-size:22px}
+  }
+
+  /* ---------- print ---------- */
+  @page{size:letter portrait;margin:.45in}
+  @media print{
+    body{background:#fff}
+    .chrome,.sheetwrap{padding:0;margin:0;display:block}
+    .noprint{display:none !important}
+    .sheet{width:auto;min-height:0;box-shadow:none;padding:0}
+    table.grid thead{display:table-header-group}
+    .rm{display:none}
+    .check .box{border-color:#333}
+    tr[data-cat] td.who{border-left-width:5px}
+    body,.sheet,.sheet *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+
+<div class="chrome noprint">
+  <div class="masthead">
+    <div class="wordmark">
+      <div class="mark">Rx</div>
+      <div>
+        <h1>Daily Lab &amp; Handout Worklist</h1>
+        <p>Upload the day's schedule &rarr; get a printable draw sheet</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="sample">Load sample day</button>
+      <button class="btn" id="clear">Clear</button>
+      <button class="btn primary" id="print" disabled>Print / Save as PDF</button>
+    </div>
+  </div>
+
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a schedule PDF">
+    <h2>Drop today's schedule PDF here</h2>
+    <p>or click to choose a file</p>
+    <div class="privacy">Reads the file in this browser only &mdash; nothing is uploaded</div>
+    <input type="file" id="file" accept="application/pdf" hidden>
+  </div>
+
+  <p class="status" id="status"></p>
+
+  <div class="addbar" id="addbar" hidden>
+    <input class="time" id="aTime" placeholder="9:20 AM" aria-label="Time">
+    <input class="name" id="aName" placeholder="Patient name" aria-label="Patient name">
+    <select id="aCat" aria-label="Visit type"></select>
+    <button class="btn" id="aAdd">Add to sheet</button>
+  </div>
+
+  <details class="diag" id="diag" hidden>
+    <summary>What the reader pulled out of the PDF</summary>
+    <div class="body">
+      <p style="margin:0 0 8px;font-size:12.5px;color:var(--muted)">
+        Every line of text, in order. If a patient was skipped, the fix lives here &mdash;
+        send me this text and I'll match the parser to your real schedule format.
+      </p>
+      <pre id="raw"></pre>
+    </div>
+  </details>
+</div>
+
+<div class="sheetwrap">
+  <section class="sheet" id="sheet">
+    <header class="sheethead">
+      <div class="row1">
+        <span class="title">Prenatal Draw &amp; Handout Sheet</span>
+        <span class="count" id="count"></span>
+      </div>
+      <h2 class="date" id="dateline">No schedule loaded</h2>
+      <div class="span" id="spanline"></div>
+    </header>
+
+    <table class="grid">
+      <colgroup><col class="c1"><col class="c2"><col class="c3"></colgroup>
+      <thead>
+        <tr><th>Name &amp; time</th><th>Lab info</th><th>Handouts</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+
+    <div class="empty" id="empty">
+      <strong>Nothing on the sheet yet</strong>
+      Load a schedule PDF, or try the sample day to see the layout.
+    </div>
+
+    <footer class="sheetfoot">
+      <span id="footL">FBC Naples &mdash; internal worklist</span>
+      <span id="footR"></span>
+    </footer>
+  </section>
+</div>
+
+<script>
+/* ============================================================
+   1. RULES — the whole clinical spec lives in this one object
+   ============================================================ */
+const RULES = [
+  { id:'gtt3', label:'3 Hour Glucose',
+    match:/(3\s*(hr|hour)s?\b.*(gluc|gtt|tol))|(\b100\s*g)|(3\s*(hr|hour)\s*(gtt|glucose))/i,
+    labs:['100gm Gluc'],
+    handouts:[{t:'Fasting spec first',flag:true}] },
+
+  { id:'sneak', label:'Sneak Peek',
+    match:/sneak\s*-?\s*peek/i,
+    labs:[{t:'Collect $120',flag:true}],
+    handouts:['Copy form'] },
+
+  { id:'36wk', label:'36 Week Labs',
+    match:/\b3[5-7]\s*(\+\s*\d\s*)?(wk|wks|week|weeks)\b|\b36\s*week\s*lab/i,
+    labs:['CBC','TIBC','Gen Cult','GBS Cult'],
+    handouts:['Birth Pref','Doula Q'] },
+
+  { id:'glucose1', label:'26–28 Week Glucose',
+    match:/((2[4-9]|3[01])\s*(-|–|to)?\s*(2[4-9]|3[01])?\s*(wk|wks|week|weeks)?.*(gluc|gtt))|(\b50\s*g)|(1\s*(hr|hour)\s*(gluc|gtt))/i,
+    labs:['50gm Gluc','CBC','TIBC','Antibody'],
+    handouts:['Risk Screen','Cord Blood'] },
+
+  { id:'initial', label:'Initial Labs',
+    match:/initial\s*(ob|lab|visit)?|new\s*ob\b|\bnob\b|first\s*(ob|prenatal|visit)/i,
+    labs:['OB','TSH','TIBC','Vit D','A1c','NIPT','Carrier','U/C','GC/CT','Drug'],
+    handouts:[] },
+
+  /* Last resort. Any line that says "labs" but matches none of the rules
+     above lands here, so nobody gets dropped. MUST stay last in this list. */
+  { id:'generic', label:'Labs',
+    match:/\blabs?\b/i,
+    labs:['Quad Screen (16–18wk)', {t:'Other', write:true}],
+    handouts:[] }
+];
+
+/* An appointment only counts if the reason line says "lab" or "labs".
+   Sneak Peek is the one exception — it never carries the word but still
+   needs a row (collection + form). Remove 'sneak' below to drop it. */
+const NEEDS_LAB   = /lab(?:s|work)?\b/i;   // no leading \b: matches "36WeekLabs" too
+const LAB_EXEMPT  = new Set(['sneak']);
+
+const TIME_RX = /\b(1[0-2]|0?[1-9])[:.]([0-5]\d)\s*([APap][.\s]?[Mm]\.?)?\b/;
+const TIME_G  = /\b(1[0-2]|0?[1-9])[:.]([0-5]\d)\s*([APap][.\s]?[Mm]\.?)?\b/g;
+
+/* Each appointment block carries its own date line. That line is the most
+   reliable divider between one appointment and the next, and the two times
+   (start, then end) always sit immediately above it. */
+const DATE_LINE = /(?:mon|tues|wednes|thurs|fri|satur|sun)day\s*,?\s*(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s*\d{1,2}\s*,?\s*\d{4}/i;
+
+/* Column junk that rides along on the same line as a name. */
+const NOISE = /family\s*birth\s*cent\w*|\b\d+\s*min\b|\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/gi;
+
+const fmtTime = t => t.replace(/\s+/g,'').toUpperCase().replace(/([AP]M)$/,' $1');
+const timesIn = line => (line.match(TIME_G) || []).map(fmtTime);
+
+/* The START time is the earliest time in the cluster directly above the
+   date line — the end time is always later, so taking the minimum is safe. */
+function startTimeFor(lines, m){
+  let d = -1;
+  for (let j=m; j>=0 && m-j<=10; j--) if (DATE_LINE.test(lines[j])) { d = j; break; }
+  const from = d >= 0 ? d : m-1;
+  const found = [];
+  for (let j=from; j>=0 && (from-j)<=4; j--){
+    const t = timesIn(lines[j] || '');
+    if (t.length) found.push(...t);
+    else if (found.length) break;                 // cluster ended
+  }
+  if (!found.length){                             // fallback: nearest time above
+    for (let j=m; j>=0 && m-j<=10; j--){
+      const t = timesIn(lines[j] || '');
+      if (t.length){ found.push(...t); break; }
+    }
+  }
+  if (!found.length) return '';
+  return found.sort((a,b)=>toMin(a)-toMin(b))[0];
+}
+
+/* Acuity blocks can end with a free-text note (e.g. "CBC/TIBC/Progesterone").
+   Everything between the reason line and the next appointment is candidate
+   text; location, duration and phone are structural and get dropped. */
+const NOTE_JUNK = /lab|gluc|gtt|sneak|peek|screen|rehearsal|consult|tour/i;
+
+function noteFor(lines, m, rule){
+  const notes = [];
+  const cur = lines[m] || '';
+  const hit = cur.match(rule.match);
+  if (hit){
+    const tail = cleanName(cur.slice(hit.index + hit[0].length));
+    // must start cleanly — a lowercase start means we sliced mid-word
+    if (/^[A-Z0-9]/.test(tail) && !NOTE_JUNK.test(tail)) notes.push(tail);
+  }
+  for (let j=m+1; j<lines.length && j-m<=8; j++){
+    const l = (lines[j]||'').trim();
+    if (!l) continue;
+    if (DATE_LINE.test(l) || timesIn(l).length) break;      // next appointment
+    if (/^\d+\s*min\b/i.test(l)) continue;                  // duration
+    if (/family\s*birth\s*cent/i.test(l)) continue;         // calendar name
+    if (l.replace(/\D/g,'').length >= 10 && !/[A-Za-z]{3}/.test(l)) continue;  // phone
+    if (RULES.some(r=>r.match.test(l))) continue;           // another reason line
+    if (NOTE_JUNK.test(l)) continue;
+    notes.push(l);
+  }
+  return notes.join(' · ').slice(0,64);
+}
+
+/* A line can hold the times, the date and the name all at once, so clean
+   every candidate first and judge the residue — never skip on sight. */
+function looksLikeName(c){
+  if (!c || c.length < 3) return false;
+  if (!/[A-Za-z]{2}/.test(c)) return false;
+  if (/lab|gluc|gtt|screen|sneak|peek|initial|rehearsal|consult|tour/i.test(c)) return false;
+  return !RULES.some(r => r.match.test(c));
+}
+
+function nameFor(lines, m, rule){
+  const cur = lines[m] || '';
+  const hit = cur.match(rule.match);
+  if (hit && hit.index > 2){                       // name and reason share a line
+    const c = cleanName(cur.slice(0, hit.index));
+    if (looksLikeName(c)) return c;
+  }
+  for (let j=m-1; j>=0 && m-j<=4; j--){
+    const raw = lines[j] || '';
+    const c = cleanName(raw);
+    if (looksLikeName(c)) return c;
+    if (RULES.some(r => r.match.test(raw))) break; // crossed into the previous appointment
+  }
+  return 'Unnamed';                                // never borrow a neighbour's name
+}
+
+/* ============================================================
+   2. STATE + RENDER
+   ============================================================ */
+let state = { date:'', span:'', rows:[] };
+
+const $ = s => document.querySelector(s);
+const rowsEl=$('#rows'), emptyEl=$('#empty'), dateEl=$('#dateline'),
+      spanEl=$('#spanline'), countEl=$('#count'), footR=$('#footR'),
+      statusEl=$('#status'), printBtn=$('#print');
+
+function check(item){
+  const o = typeof item === 'object' ? item : {t:item};
+  const cls = 'check' + (o.flag ? ' flag' : '') + (o.write ? ' write' : '');
+  return `<li class="${cls}"><span class="box"></span><span>${esc(o.t)}</span>`
+       + (o.note  ? `<span class="note">${esc(o.note)}</span>` : '')
+       + (o.write ? '<span class="wline"></span>' : '') + `</li>`;
+}
+function checklist(items, fallback){
+  if (!items.length) return `<span class="none">${fallback}</span>`;
+  return `<ul class="checks${items.length>5?' two':''}">${items.map(check).join('')}</ul>`;
+}
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function render(){
+  const has = state.rows.length > 0;
+  emptyEl.hidden = has;
+  printBtn.disabled = !has;
+  $('#addbar').hidden = false;
+
+  dateEl.textContent = state.date || (has ? 'Date not found on PDF — tap to type it' : 'No schedule loaded');
+  dateEl.setAttribute('contenteditable','true');
+  spanEl.textContent = state.span || '';
+  countEl.textContent = has ? `${state.rows.length} PATIENT${state.rows.length>1?'S':''}` : '';
+  footR.textContent = 'Printed ' + new Date().toLocaleString('en-US',
+    {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+
+  rowsEl.innerHTML = state.rows.map((r,i)=>{
+    const rule = RULES.find(x=>x.id===r.cat);
+    const labs = checklist(
+      rule.labs.map(x => (x && x.write && r.note) ? {t:x.t, note:r.note} : x), '—');
+    const hand = checklist(rule.handouts, 'none');
+    return `<tr data-cat="${r.cat}">
+      <td class="who">
+        <button class="rm noprint" data-i="${i}" title="Remove row" aria-label="Remove ${esc(r.name)}">&times;</button>
+        <div class="pname" contenteditable>${esc(r.name)}</div>
+        <div class="ptime" contenteditable>${esc(r.time||'—')}</div>
+        <div class="pcat">${esc(rule.label)}</div>
+      </td>
+      <td>${labs}</td>
+      <td>${hand}</td>
+    </tr>`;
+  }).join('');
+
+  rowsEl.querySelectorAll('.rm').forEach(b=>b.onclick=()=>{
+    state.rows.splice(+b.dataset.i,1); render();
+  });
+}
+
+/* ============================================================
+   3. PDF READING  (all client-side)
+   ============================================================ */
+/* pdf.js is loaded on demand. Local copy first — drop pdf.min.js and
+   pdf.worker.min.js next to this file and it never touches a CDN again. */
+const PDFJS_SOURCES = [
+  { lib:'./pdf.min.js',
+    worker:'./pdf.worker.min.js' },
+  { lib:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+    worker:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js' },
+  { lib:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
+    worker:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js' },
+  { lib:'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js',
+    worker:'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js' }
+];
+
+function loadScript(src){
+  return new Promise((resolve,reject)=>{
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error(src));
+    document.head.appendChild(s);
+  });
+}
+
+let pdfReady = null;
+function ensurePdfjs(){
+  if (window.pdfjsLib) return Promise.resolve();
+  if (pdfReady) return pdfReady;
+  pdfReady = (async () => {
+    for (const src of PDFJS_SOURCES){
+      try{
+        await loadScript(src.lib);
+        if (window.pdfjsLib){                      // a 404 can "load" without defining it
+          pdfjsLib.GlobalWorkerOptions.workerSrc = src.worker;
+          return;
+        }
+      }catch(e){ /* try the next source */ }
+    }
+    pdfReady = null;
+    throw new Error('PDFJS_BLOCKED');
+  })();
+  return pdfReady;
+}
+
+async function readPdf(file){
+  try{
+    if (!window.pdfjsLib) setStatus('Loading the PDF reader…');
+    await ensurePdfjs();
+  }catch(e){
+    setStatus('Could not load the PDF reader — this preview pane blocks outside scripts. '
+      + 'Download the file and open it in Chrome, or put it on a real URL and it works. '
+      + '"Load sample day" still shows the layout.', true);
+    return;
+  }
+  setStatus('Reading ' + file.name + '…');
+  try{
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data:buf}).promise;
+    let lines = [];
+    for (let p=1; p<=pdf.numPages; p++){
+      const tc = await (await pdf.getPage(p)).getTextContent();
+      const byY = new Map();
+      tc.items.forEach(it=>{
+        const y = Math.round(it.transform[5]);
+        let key = [...byY.keys()].find(k=>Math.abs(k-y)<=2);
+        if (key===undefined) key = y, byY.set(y,[]);
+        byY.get(key).push({x:it.transform[4], s:it.str});
+      });
+      [...byY.entries()].sort((a,b)=>b[0]-a[0]).forEach(([,parts])=>{
+        const t = parts.sort((a,b)=>a.x-b.x).map(p=>p.s).join(' ')
+                       .replace(/\s{2,}/g,'  ').trim();
+        if (t) lines.push(t);
+      });
+    }
+    $('#raw').textContent = lines.join('\n');
+    $('#diag').hidden = false;
+    parse(lines);
+  }catch(e){
+    setStatus('Could not read that PDF: ' + e.message, true);
+  }
+}
+
+function parse(lines){
+  const full = lines.join('\n');
+  state.date = findDate(full);
+  state.span = findSpan(lines);
+  state.rows = [];
+
+  const skipped = [];
+
+  for (let i=0;i<lines.length;i++){
+    const hit = RULES.find(r=>r.match.test(lines[i]));
+    if (!hit) continue;
+    if (!LAB_EXEMPT.has(hit.id) && !NEEDS_LAB.test(lines[i])){
+      skipped.push(`${hit.label.padEnd(20)} | ${lines[i]}`);
+      continue;                                   // looks like a match, but no "labs"
+    }
+    state.rows.push({ name: nameFor(lines, i, hit),
+                      time: startTimeFor(lines, i),
+                      note: noteFor(lines, i, hit),
+                      cat:  hit.id });
+  }
+
+  if (skipped.length){
+    $('#raw').textContent += '\n\n' + '─'.repeat(46)
+      + `\nSKIPPED — matched a visit type but the line never says "labs":\n`
+      + skipped.join('\n');
+  }
+
+  state.rows = state.rows
+    .map((r,i)=>({...r,_i:i}))
+    .sort((a,b)=> (toMin(a.time)-toMin(b.time)) || (a._i-b._i));
+  render();
+  setStatus(state.rows.length
+    ? `Matched ${state.rows.length} of ${lines.length} lines. Check the sheet, then print.`
+    : 'No matching visit types found. Open the reader panel below and send me that text.',
+    !state.rows.length);
+}
+
+const cleanName = l => String(l||'')
+  .replace(TIME_G,'')
+  .replace(DATE_LINE,'')
+  .replace(NOISE,'')
+  .replace(/^[\s|•\-–—#]*\d{0,8}[\s|•\-–—]*/,'')
+  .replace(/[|•]/g,'')
+  .replace(/\s{2,}/g,' ').trim();
+const pickTime = l => { const m = l.match(TIME_RX); return m ? m[0].replace(/\s+/g,' ').toUpperCase() : ''; };
+function toMin(t){
+  const m = (t||'').match(TIME_RX); if(!m) return 9999;
+  let h=+m[1]; const mi=+m[2], pm=/p/i.test(m[3]||'');
+  if(pm && h!==12) h+=12; if(!pm && h===12) h=0;
+  return h*60+mi;
+}
+function findDate(text){
+  const MON='January|February|March|April|May|June|July|August|September|October|November|December';
+  const DOW='Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday';
+  let m = text.match(new RegExp(`(?:(${DOW}),?\\s*)?(${MON})\\s*\\d{1,2}\\s*,?\\s*\\d{4}`,'i'));
+  if (m) return m[0].replace(/\s+/g,' ');
+  m = text.match(/\b(0?[1-9]|1[0-2])[\/\-](0?[1-9]|[12]\d|3[01])[\/\-](20\d{2}|\d{2})\b/);
+  if (m){
+    const d = new Date(+((m[3].length===2?'20':'')+m[3]), m[1]-1, m[2]);
+    if (!isNaN(d)) return d.toLocaleDateString('en-US',
+      {weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  }
+  return '';
+}
+function findSpan(lines){
+  const ts = lines.map(pickTime).filter(Boolean).sort((a,b)=>toMin(a)-toMin(b));
+  return ts.length ? `Clinic hours on this schedule: ${ts[0]} – ${ts[ts.length-1]}` : '';
+}
+
+/* ============================================================
+   4. WIRING
+   ============================================================ */
+function setStatus(msg, err){ statusEl.textContent = msg||''; statusEl.classList.toggle('err', !!err); }
+
+const drop=$('#drop'), fileIn=$('#file');
+drop.onclick = () => fileIn.click();
+drop.onkeydown = e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();fileIn.click();} };
+fileIn.onchange = e => e.target.files[0] && readPdf(e.target.files[0]);
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop', e => { const f=e.dataTransfer.files[0]; if(f) readPdf(f); });
+
+function openPrintWindow(){
+  const css = [...document.querySelectorAll('style')].map(s=>s.outerHTML).join('');
+  const fonts = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Narrow:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">';
+  const html = `<!doctype html><meta charset="utf-8"><title>Worklist &mdash; ${esc(state.date||'')}</title>`
+    + fonts + css
+    + `<style>body{background:#fff}.sheetwrap{padding:0;display:block}
+        .sheet{box-shadow:none;width:auto;min-height:0;padding:.35in}
+        .rm,.noprint{display:none !important}
+        [contenteditable]{-webkit-user-modify:read-only;user-modify:read-only}</style>`
+    + `<div class="sheetwrap">${$('#sheet').outerHTML}</div>`
+    + `<script>window.onload=function(){setTimeout(function(){window.print()},500)}<\/script>`;
+
+  let w = null;
+  try { w = window.open('', '_blank', 'width=880,height=1120'); } catch(e){}
+  if (!w || !w.document) return false;
+  w.document.open(); w.document.write(html); w.document.close();
+  return true;
+}
+
+$('#print').onclick = () => {
+  if (openPrintWindow()){
+    setStatus('Print preview opened in a new tab.');
+    return;
+  }
+  try { window.print(); } catch(e){}
+  setStatus('This preview pane blocks the print dialog. Download the file with the button above the preview and open it in Chrome — printing works normally there.', true);
+};
+$('#clear').onclick = () => { state={date:'',span:'',rows:[]}; $('#diag').hidden=true; setStatus(''); render(); };
+
+// add-row control
+const aCat=$('#aCat');
+aCat.innerHTML = RULES.map(r=>`<option value="${r.id}">${r.label}</option>`).join('');
+$('#aAdd').onclick = () => {
+  const name=$('#aName').value.trim(); if(!name) return $('#aName').focus();
+  state.rows.push({name, time:$('#aTime').value.trim(), cat:aCat.value});
+  state.rows.sort((a,b)=>toMin(a.time)-toMin(b.time));
+  $('#aName').value=''; $('#aTime').value=''; render();
+};
+
+$('#sample').onclick = () => {
+  state = {
+    date:'Tuesday, August 19, 2026',
+    span:'Clinic hours on this schedule: 8:40 AM – 3:30 PM',
+    rows:[
+      {name:'Alvarez, Marisol',   time:'8:40 AM',  cat:'initial'},
+      {name:'Chen, Priya',        time:'9:00 AM',  cat:'gtt3'},
+      {name:'Okonkwo, Ada',       time:'9:20 AM',  cat:'glucose1'},
+      {name:'Reyes, Daniela',     time:'10:15 AM', cat:'36wk'},
+      {name:'Whitfield, Jordan',  time:'11:00 AM', cat:'sneak'},
+      {name:'Haddad, Leila',      time:'11:40 AM', cat:'generic',
+       note:'CBC / TIBC / Progesterone'},
+      {name:'Baptiste, Nadege',   time:'1:10 PM',  cat:'glucose1'},
+      {name:'Fontaine, Claire',   time:'2:05 PM',  cat:'36wk'},
+      {name:'Novak, Sara',        time:'3:30 PM',  cat:'initial'}
+    ]
+  };
+  $('#diag').hidden = true;
+  setStatus('Sample day loaded — this is what a parsed schedule looks like.');
+  render();
+};
+
+render();
+</script>

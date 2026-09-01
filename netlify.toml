@@ -1,0 +1,27 @@
+[build]
+  publish = "."
+  command = ""
+
+# robots.txt asks crawlers not to index. This header enforces it even for
+# crawlers that ignore robots.txt, and covers direct links to the page.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet"
+    Referrer-Policy = "no-referrer"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Permissions-Policy = "geolocation=(), camera=(), microphone=()"
+
+# pdf.js is pinned to a version, so it can cache hard.
+[[headers]]
+  for = "/pdf*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# The app itself must never be stale — staff should get rule changes
+# on their next refresh, not whenever the browser feels like it.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
