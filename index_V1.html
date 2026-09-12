@@ -18,7 +18,6 @@
     --teal:#0f5c5b;
     --amber:#a1510e;
     --amber-tint:#fdf3e6;
-    --spin:#c1121f;        /* SPIN flag — must stay legible in B&W too */
 
     /* visit-type spines — chosen to stay distinct from each other
        in hue AND in grayscale, so they survive a B&W printer */
@@ -141,7 +140,7 @@
     text-transform:uppercase;letter-spacing:.12em;color:var(--muted);
     text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule);
   }
-  col.c1{width:24%} col.c2{width:56%} col.c3{width:20%}
+  col.c1{width:27%} col.c2{width:39%} col.c3{width:34%}
 
   table.grid tbody tr{border-bottom:1px solid var(--hair);page-break-inside:avoid;break-inside:avoid}
   table.grid td{padding:9px 9px 10px;vertical-align:top}
@@ -156,15 +155,9 @@
   .pname{font-weight:600;font-size:14.5px;line-height:1.25}
   .ptime{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500;color:var(--ink)}
   .pcat{
-    font-family:'Archivo Narrow',sans-serif;font-size:9.5px;font-weight:700;
-    text-transform:uppercase;letter-spacing:.11em;color:var(--cat-gen);margin-top:3px;
+    font-family:'Archivo Narrow',sans-serif;font-size:9.5px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.11em;color:var(--muted);margin-top:3px;
   }
-  tr[data-cat="36wk"]     .pcat{color:var(--cat-36)}
-  tr[data-cat="glucose1"] .pcat{color:var(--cat-glu)}
-  tr[data-cat="initial"]  .pcat{color:var(--cat-init)}
-  tr[data-cat="gtt3"]     .pcat{color:var(--cat-gtt3)}
-  tr[data-cat="sneak"]    .pcat{color:var(--cat-sneak)}
-  tr[data-cat="generic"]  .pcat{color:var(--cat-gen)}
   [contenteditable]:hover{background:#f2f7f6;border-radius:2px}
 
   .checks{margin:0;padding:0;list-style:none}
@@ -182,31 +175,23 @@
   .check.flag .box{border-color:var(--amber);border-width:1.6px;background:var(--amber-tint)}
   .check.write{padding:4px 0 3px}
   .check .note{margin-left:6px;font-weight:700;white-space:normal}
-  .check .code{margin-left:6px;color:var(--muted);font-size:9.5px;letter-spacing:.02em}
-  .check .tubes{margin-left:6px;color:var(--muted);font-size:9.5px}
-  .check i{font-style:normal;color:var(--muted);font-size:9.5px}
+  .check .wline{
+    flex:1;min-width:52px;align-self:flex-end;height:0;
+    border-bottom:1px solid var(--rule);margin:0 0 3px 5px;
+  }
+  .none{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
 
-  .check.tl{display:flex;align-items:flex-start;gap:7px;padding:3.5px 0}
-  .check.tl .tname{min-width:80px;flex:none}
-  .check.tl .code{min-width:58px;flex:none;margin-left:0}
-  .check.tl .tubes{
-    flex:1 1 110px;color:#3a4441;font-size:9.5px;line-height:1.5;white-space:normal;
+  .rm{
+    position:absolute;right:-2px;top:6px;border:0;background:none;cursor:pointer;
+    color:var(--muted);font-size:15px;line-height:1;padding:2px 4px;opacity:0;
   }
+  tr:hover .rm{opacity:1}
+  .rm:hover{color:var(--amber)}
 
-  .opt{margin-top:8px;padding-top:7px;border-top:1px dashed var(--rule)}
-  .opt .lbl{
-    font-family:'Archivo Narrow',sans-serif;font-size:9px;font-weight:700;
-    text-transform:uppercase;letter-spacing:.13em;color:var(--muted);margin-bottom:3px;
-  }
-  .tubesum{
-    list-style:none;margin:7px 0 0;padding:0;
-    font-family:'JetBrains Mono',monospace;font-size:9.5px;
-    line-height:1.6;color:#3a4441;
-  }
-  .tubesum li{padding:.5px 0}
-  .spin{
-    margin-left:5px;padding:0 3px;border:1.3px solid var(--spin);border-radius:2px;
-    color:var(--spin);font-weight:700;font-size:9px;letter-spacing:.05em;white-space:nowrap;
+  .sheetfoot{
+    margin-top:14px;padding-top:7px;border-top:1px solid var(--hair);
+    display:flex;justify-content:space-between;gap:12px;
+    font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--muted);
   }
 
   .empty{padding:52px 10px;text-align:center;color:var(--muted)}
@@ -317,83 +302,39 @@
 /* ============================================================
    1. RULES — the whole clinical spec lives in this one object
    ============================================================ */
-/* ---- Test catalog: order code + the tubes each test consumes -------------
-   k:'sst'    pooled — serum tubes are shared, so volumes sum then round up
-   k:<name>   not pooled — one tube per test, grouped by type and volume
-   bare:true  not a blood tube (swab, cup, urine device)                   */
-const T = {
-  OB:      {t:'OB',           code:'12075',                    tubes:[{k:'sst',ml:11},{k:'lavender',ml:1,n:1},{k:'red',ml:1,n:1}]},
-  TSH:     {t:'TSH',          code:'36127',                    tubes:[{k:'sst',ml:1}]},
-  TIBC:    {t:'TIBC',         code:'5616',                     tubes:[{k:'sst',ml:2}]},
-  VITD:    {t:'Vit D',        code:'92888',                    tubes:[{k:'sst',ml:0.5}]},
-  A1C:     {t:'A1c',          code:'496',        note:'<12wk', tubes:[{k:'lavender',ml:1,n:1}]},
-  NIPT:    {t:'NIPT',         code:'92777',      note:'>10wk', tubes:[{k:'black/tiger',ml:10,n:1}]},
-  UC:      {t:'U/C',          code:'395',                      tubes:[{k:'Yellow UriSponge',n:1,bare:true}]},
-  GCCT:    {t:'GC/CT',        code:'11363',                    tubes:[{k:'Aptima urine tube',n:1,bare:true}]},
-  DRUG:    {t:'Drug',         code:'39422',                    tubes:[{k:'Green cup',n:1,bare:true}]},
-  CBC:     {t:'CBC',          code:'6399',                     tubes:[{k:'lavender',ml:1,n:1}]},
-  G100:    {t:'100gm Gluc',   code:'6745',                     tubes:[{k:'gray',ml:1,n:4}]},
-  G50:     {t:'50gm Gluc',    code:'8477',                     tubes:[{k:'gray',ml:1,n:1}]},
-  CULT:    {t:'Gen/GBS Cult', code:'4558/15090',               tubes:[{k:'Blue Amies swab',n:1,bare:true}]},
-  QUAD:    {t:'Quad Screen',  code:'30294',    note:'16–18wk', tubes:[{k:'sst',ml:3}]},
-  ANTI:    {t:'Antibody',     code:'795',                      tubes:[{k:'red',ml:5,n:1}]},
-  CARRIER: {t:'Carrier',      code:'94372',                    tubes:[{k:'lavender',ml:1,n:4}]},
-  RHD:     {t:'RHD Fetal',    code:'16592',      note:'>10wk', tubes:[{k:'lavender',ml:10,n:1}]}
-};
-
-/* Serum yield per SST tube, derived from OB: 11mL of serum = 3 tubes.
-   Change this one number and every SST count on the sheet recalculates. */
-const SERUM_PER_SST = 3.7;
-
 const RULES = [
   { id:'gtt3', label:'3 Hour Glucose',
     match:/(3\s*(hr|hour)s?\b.*(gluc|gtt|tol))|(\b100\s*g)|(3\s*(hr|hour)\s*(gtt|glucose))/i,
-    tests:[T.G100],
-    draw:[{t:'4 gray'}],
+    labs:['100gm Gluc'],
     handouts:[{t:'Fasting spec first',flag:true}] },
 
   { id:'sneak', label:'Sneak Peek',
     match:/sneak\s*-?\s*peek/i,
-    tests:[], extra:[{t:'Collect $120',flag:true}],
+    labs:[{t:'Collect $120',flag:true}],
     handouts:['Copy form'] },
 
   { id:'36wk', label:'36 Week Labs',
     match:/\b3[5-7]\s*(\+\s*\d\s*)?(wk|wks|week|weeks)\b|\b36\s*week\s*lab/i,
-    tests:[T.CBC,T.TIBC,T.CULT],
-    draw:[{t:'1 SST',spin:true},{t:'1 lavender'},{t:'Blue Amies swab'}],
+    labs:['CBC','TIBC','Gen Cult','GBS Cult'],
     handouts:['Birth Pref','Doula Q'] },
 
   { id:'glucose1', label:'26–28 Week Glucose',
     match:/((2[4-9]|3[01])\s*(-|–|to)?\s*(2[4-9]|3[01])?\s*(wk|wks|week|weeks)?.*(gluc|gtt))|(\b50\s*g)|(1\s*(hr|hour)\s*(gluc|gtt))/i,
-    tests:[T.G50,T.CBC,T.TIBC,T.ANTI],
-    draw:[{t:'1 SST',spin:true},{t:'1 lavender'},{t:'1 gray'}],
+    labs:['50gm Gluc','CBC','TIBC','Antibody'],
     handouts:['Risk Screen','Cord Blood'] },
 
   { id:'initial', label:'Initial Labs',
     match:/initial\s*(ob|lab|visit)?|new\s*ob\b|\bnob\b|first\s*(ob|prenatal|visit)/i,
-    tests:[T.OB,T.TSH,T.TIBC,T.VITD,T.A1C,T.NIPT,T.UC,T.GCCT,T.DRUG],
-    optional:[T.CARRIER,T.RHD],
-    draw:[{t:'1 lavender'},{t:'1 red'},{t:'4 SST',spin:true},
-          {t:'Yellow UriSponge'},{t:'Aptima urine tube'},{t:'Green cup'}],
+    labs:['OB','TSH','TIBC','Vit D','A1c','NIPT','Carrier','U/C','GC/CT','Drug'],
     handouts:[] },
 
   /* Last resort. Any line that says "labs" but matches none of the rules
      above lands here, so nobody gets dropped. MUST stay last in this list. */
   { id:'generic', label:'Labs',
     match:/\blabs?\b/i,
-    tests:[T.QUAD], extra:[{t:'Other', write:true}],
-    draw:[{t:'1 SST',spin:true}],
+    labs:['Quad Screen (16–18wk)', {t:'Other', write:true}],
     handouts:[] }
 ];
-
-/* Tube text printed beneath each test name. */
-const tubePart = tb =>
-    tb.bare        ? (tb.n>1 ? tb.n+' ' : '') + tb.k
-  : tb.k === 'sst' ? tb.ml + 'mL SST'
-  : (tb.n>1 ? tb.n + ' \u00d7 ' : '') + tb.ml + 'mL ' + tb.k;
-
-const tubeText = x => (x.tubes||[]).map(tubePart).join(' \u00b7 ');
-const hasSST   = x => (x.tubes||[]).some(tb => tb.k === 'sst');
 
 /* An appointment only counts if the reason line says "lab" or "labs".
    Sneak Peek is the one exception — it never carries the word but still
@@ -513,41 +454,6 @@ function checklist(items, fallback){
 }
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-function testItem(x){
-  return `<li class="check tl"><span class="box"></span>`
-       + `<span class="tname">${esc(x.t)}${x.note ? ` <i>(${esc(x.note)})</i>` : ''}</span>`
-       + `<span class="code">${esc(x.code)}</span>`
-       + `<span class="tubes">${esc(tubeText(x))}`
-       + (hasSST(x) ? '<span class="spin">SPIN</span>' : '') + `</span></li>`;
-}
-
-function labsCell(rule, r){
-  const tests = rule.tests || [];
-  const extra = (rule.extra || []).map(x => (x.write && r.note) ? {t:x.t, note:r.note} : x);
-  const items = tests.map(testItem).concat(extra.map(check));
-
-  let html = items.length
-    ? `<ul class="checks">${items.join('')}</ul>`
-    : `<span class="none">—</span>`;
-
-  if ((rule.optional || []).length){
-    html += `<div class="opt"><div class="lbl">If ordered</div><ul class="checks">`
-      + rule.optional.map(testItem).join('')
-      + `</ul></div>`;
-  }
-  return html;
-}
-
-/* Tube summary: plain comma-separated text under the visit type. */
-function tubeSummary(rule){
-  const draw = rule.draw || [];
-  if (!draw.length) return '';
-  return `<ul class="tubesum">`
-    + draw.map(d => `<li>${esc(d.t)}`
-        + (d.spin ? '<span class="spin">SPIN</span>' : '') + `</li>`).join('')
-    + `</ul>`;
-}
-
 function render(){
   const has = state.rows.length > 0;
   emptyEl.hidden = has;
@@ -563,7 +469,8 @@ function render(){
 
   rowsEl.innerHTML = state.rows.map((r,i)=>{
     const rule = RULES.find(x=>x.id===r.cat);
-    const labs = labsCell(rule, r);
+    const labs = checklist(
+      rule.labs.map(x => (x && x.write && r.note) ? {t:x.t, note:r.note} : x), '—');
     const hand = checklist(rule.handouts, 'none');
     return `<tr data-cat="${r.cat}">
       <td class="who">
@@ -571,7 +478,6 @@ function render(){
         <div class="pname" contenteditable>${esc(r.name)}</div>
         <div class="ptime" contenteditable>${esc(r.time||'—')}</div>
         <div class="pcat">${esc(rule.label)}</div>
-        ${tubeSummary(rule)}
       </td>
       <td>${labs}</td>
       <td>${hand}</td>
