@@ -27,7 +27,6 @@
     --cat-init:#57891a;    /* green         */
     --cat-gtt3:#e07000;    /* orange        */
     --cat-sneak:#b0246f;   /* magenta       */
-    --cat-quad:#6a35c9;    /* violet        */
     --cat-gen:#7b8288;     /* neutral gray  */
   }
 
@@ -152,7 +151,6 @@
   tr[data-cat="initial"]  td.who{border-left-color:var(--cat-init)}
   tr[data-cat="gtt3"]     td.who{border-left-color:var(--cat-gtt3)}
   tr[data-cat="sneak"]    td.who{border-left-color:var(--cat-sneak)}
-  tr[data-cat="quad"]     td.who{border-left-color:var(--cat-quad)}
   tr[data-cat="generic"]  td.who{border-left-color:var(--cat-gen)}
 
   .pname{font-weight:600;font-size:14.5px;line-height:1.25}
@@ -166,7 +164,6 @@
   tr[data-cat="initial"]  .pcat{color:var(--cat-init)}
   tr[data-cat="gtt3"]     .pcat{color:var(--cat-gtt3)}
   tr[data-cat="sneak"]    .pcat{color:var(--cat-sneak)}
-  tr[data-cat="quad"]     .pcat{color:var(--cat-quad)}
   tr[data-cat="generic"]  .pcat{color:var(--cat-gen)}
   [contenteditable]:hover{background:#f2f7f6;border-radius:2px}
 
@@ -374,23 +371,18 @@ const RULES = [
 
   { id:'initial', label:'Initial Labs',
     match:/initial\s*(ob|lab|visit)?|new\s*ob\b|\bnob\b|first\s*(ob|prenatal|visit)/i,
-    tests:[T.OB,T.TSH,T.TIBC,T.VITD,T.A1C,T.UC,T.GCCT,T.DRUG],
-    optional:[T.NIPT,T.CARRIER,T.RHD],
+    tests:[T.OB,T.TSH,T.TIBC,T.VITD,T.A1C,T.NIPT,T.UC,T.GCCT,T.DRUG],
+    optional:[T.CARRIER,T.RHD],
     draw:[{t:'1 lavender'},{t:'1 red'},{t:'4 SST',spin:true},
           {t:'Yellow UriSponge'},{t:'Aptima urine tube'},{t:'Green cup'}],
-    handouts:[] },
-
-  { id:'quad', label:'Quad Screen Labs',
-    match:/quad\s*-?\s*screen|\bquad\b/i,
-    tests:[T.QUAD],
-    draw:[{t:'1 SST',spin:true}],
     handouts:[] },
 
   /* Last resort. Any line that says "labs" but matches none of the rules
      above lands here, so nobody gets dropped. MUST stay last in this list. */
   { id:'generic', label:'Labs',
     match:/\blabs?\b/i,
-    tests:[], extra:[{t:'Other', write:true}],
+    tests:[T.QUAD], extra:[{t:'Other', write:true}],
+    draw:[{t:'1 SST',spin:true}],
     handouts:[] }
 ];
 
@@ -808,7 +800,6 @@ $('#sample').onclick = () => {
       {name:'Whitfield, Jordan',  time:'11:00 AM', cat:'sneak'},
       {name:'Haddad, Leila',      time:'11:40 AM', cat:'generic',
        note:'CBC / TIBC / Progesterone'},
-      {name:'Okafor, Amara',      time:'12:15 PM', cat:'quad'},
       {name:'Baptiste, Nadege',   time:'1:10 PM',  cat:'glucose1'},
       {name:'Fontaine, Claire',   time:'2:05 PM',  cat:'36wk'},
       {name:'Novak, Sara',        time:'3:30 PM',  cat:'initial'}
